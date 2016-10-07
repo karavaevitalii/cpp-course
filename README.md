@@ -4,5 +4,5 @@
 ***
 ###Spring 2016
 * [Big Integer arithmetic](https://github.com/karavaevitalii/university-cpp-course/tree/master/spring-2016/big_integer)
-* [Assembley](https://github.com/karavaevitalii/university-cpp-course/tree/master/spring-2016/asm)
+* [Assembly](https://github.com/karavaevitalii/university-cpp-course/tree/master/spring-2016/asm)
 
