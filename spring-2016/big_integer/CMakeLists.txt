@@ -7,6 +7,8 @@ include_directories(${big_integer_SOURCE_DIR})
 set(SRC_FILES src/big_integer.cpp
 		includes/big_integer.h
 		test/big_integer_testing.cpp
+		includes/storage.h
+		src/storage.cpp
 		test/gtest/gtest.h
 		test/gtest/gtest-all.cc
 		test/gtest/gtest_main.cc)
@@ -15,6 +17,8 @@ add_executable(big_integer_testing ${SRC_FILES})
 
 set(TEST_FILES src/big_integer.cpp
         includes/big_integer.h
+		src/storage.cpp
+		includes/storage.h
         test/test.cpp)
 
 add_executable(local_test ${TEST_FILES})

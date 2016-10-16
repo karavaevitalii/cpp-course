@@ -6,15 +6,15 @@
 typedef __uint128_t u128;
 
 big_integer::big_integer()
-    :sign_(true)
-    ,data_(0)
+    : sign_(true)
+    , data_(0)
 {}
 big_integer::big_integer(big_integer const& other)
-    :sign_(other.sign_)
-    ,data_(other.data_)
+    : sign_(other.sign_)
+    , data_(other.data_)
 {}
 big_integer::big_integer(int number)
-    :sign_(true)
+    : sign_(true)
 {
     int64_t tmp = number;
     if (number < 0)
@@ -306,7 +306,7 @@ big_integer big_integer::operator --(int)
 big_integer& big_integer::operator <<=(int shift)
 {
     size_t insert = static_cast<size_t>(shift) / std::numeric_limits<size_t>::digits;
-    data_.insert(data_.begin(), insert, 0);
+    data_.insert(0, insert, 0);
     size_t shl = static_cast<size_t>(shift) % std::numeric_limits<size_t>::digits;
     if (shl != 0)
     {
@@ -328,7 +328,7 @@ big_integer& big_integer::operator >>=(int shift)
     size_t del = static_cast<size_t>(shift) / std::numeric_limits<size_t>::digits;
     if (del > data_.size())
         return *this = 0;
-    data_.erase(data_.begin(), data_.begin() + del);
+    data_.erase(0, del);
     size_t shr = static_cast<size_t>(shift) % std::numeric_limits<size_t>::digits;
     if (shr != 0)
     {
@@ -422,7 +422,7 @@ big_integer& big_integer::operator/=(big_integer const& rhs)
         quotient.data_.back() = 1;
     }
     u128 result = 0;
-    for (size_t i =  m; i != 0; --i)
+    for (size_t i = m; i != 0; --i)
     {
         result = ((static_cast<u128>(n + i - 1 < this->data_.size() ? this->data_[n + i - 1] : 0)
             << std::numeric_limits<size_t>::digits) +

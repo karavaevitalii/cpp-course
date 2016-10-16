@@ -4,12 +4,13 @@
 #include <string>
 #include <limits>
 #include <vector>
+#include "storage.h"
 
 struct big_integer
 {
 private:
     bool sign_;
-    std::vector<size_t> data_;
+    storage data_;
     void trim();
     void add_long_short(size_t const);
     void mul_long_short(size_t const);

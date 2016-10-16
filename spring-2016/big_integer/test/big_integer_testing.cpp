@@ -1,8 +1,5 @@
 #include <algorithm>
 #include <cassert>
-#include <cstdlib>
-#include <vector>
-#include <utility>
 #include <test/gtest/gtest.h>
 
 #include "includes/big_integer.h"
