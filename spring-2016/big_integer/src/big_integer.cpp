@@ -306,7 +306,7 @@ big_integer big_integer::operator --(int)
 big_integer& big_integer::operator <<=(int shift)
 {
     size_t insert = static_cast<size_t>(shift) / std::numeric_limits<size_t>::digits;
-    data_.insert(0, insert, 0);
+    data_.insert(data_.begin(), insert, 0);
     size_t shl = static_cast<size_t>(shift) % std::numeric_limits<size_t>::digits;
     if (shl != 0)
     {
@@ -328,7 +328,7 @@ big_integer& big_integer::operator >>=(int shift)
     size_t del = static_cast<size_t>(shift) / std::numeric_limits<size_t>::digits;
     if (del > data_.size())
         return *this = 0;
-    data_.erase(0, del);
+    data_.erase(data_.begin(), data_.begin() + del);
     size_t shr = static_cast<size_t>(shift) % std::numeric_limits<size_t>::digits;
     if (shr != 0)
     {

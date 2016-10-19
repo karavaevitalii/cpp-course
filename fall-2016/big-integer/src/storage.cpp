@@ -1,55 +1,40 @@
 #include "includes/storage.h"
-storage::shared_vector::shared_vector(size_t const size, size_t const element)
-    : data_(size, element)
-    , links(1)
+storage::shared_vector::shared_vector(size_t size, size_t element)
+    : data_(new std::vector<size_t>(size, element))
 {}
-bool storage::is_small() const
+storage::shared_vector::shared_vector(storage::shared_vector const& that)
+    : data_(that.data_)
+{}
+void storage::shared_vector::detach()
 {
-    return small < 2;
-}
-uint8_t storage::init_small(size_t const size)
-{
-    if (size == 0)
-        return 0;
-    else if (size == 1)
-        return 1;
-    else
-        return 2;
-}
-void storage::detach()
-{
-    if (d_storage->links > 1)
-    {
-        shared_vector* s_vector = new shared_vector(*d_storage);
-        --d_storage->links;
-        std::swap(s_vector, d_storage);
-    }
+    if (!data_.unique())
+        this->data_ = std::make_shared<std::vector<size_t>>(*this->data_);
 }
 void storage::safe_delete()
 {
-    if (!is_small())
-    {
-        if (d_storage->links > 1)
-            --d_storage->links;
-        else
-            delete d_storage;
-    }
+    if (size_ > 1)
+        delete d_storage;
 }
-storage::storage(size_t const size, size_t const element)
-    : small(init_small(size))
+storage::storage(size_t size, size_t element)
 {
-    if (is_small())
+    if (size > 1)
+        size_ = 2;
+    else if (size == 1)
+        size_ = 1;
+    else
+        size_ = 0;
+    if (size_ < 2)
         s_storage = element;
     else
         d_storage = new shared_vector(size, element);
 }
 storage::storage(storage const& that)
-    : small(that.small)
+    : size_(that.size_)
 {
-    if (is_small())
-        s_storage = that.s_storage;
+    if (this->size_ < 2)
+        this->s_storage = that.s_storage;
     else
-        d_storage = that.d_storage;
+        this->d_storage = new shared_vector(*that.d_storage);
 }
 storage::~storage()
 {
@@ -57,134 +42,178 @@ storage::~storage()
 }
 storage& storage::operator=(storage const& that)
 {
-    if (!is_small())
-        safe_delete();
-    this->small = that.small;
-    if (is_small())
-        this->s_storage = that.s_storage;
+    if (this == &that)
+        return *this;
+    safe_delete();
+    this->size_ = that.size_;
+    if (size_ < 2)
+        s_storage = that.s_storage;
     else
-    {
-        ++that.d_storage->links;
-        this->d_storage = that.d_storage;
-    }
+        d_storage = new shared_vector(*that.d_storage);
     return *this;
-
 }
-void storage::resize(size_t const size, size_t const element)
+void storage::resize(size_t size, size_t element)
 {
-    if (is_small())
-        if (size < 2)
-        {
-            s_storage = element;
-            small = 1;
-        }
-        else
-        {
-            d_storage = new shared_vector(size, element);
-            small = 2;
-        }
+    if (size == 0)
+    {
+        s_storage = 0;
+        size_ = 0;
+    }
+    if (size == 1)
+    {
+        s_storage = element;
+        size_ = 1;
+    }
+    else if (size_ < 2)
+    {
+        d_storage = new shared_vector(size, element);
+        size_ = 2;
+    }
     else
     {
-        detach();
-        d_storage->data_.resize(size, element);
+        d_storage->detach();
+        d_storage->data_.get()->resize(size, element);
     }
+
 }
 size_t storage::size() const
 {
-    if (is_small())
-        return static_cast<size_t>(small);
-    return d_storage->data_.size();
+    if (size_ == 0)
+        return 0;
+    if (size_ == 1)
+        return 1;
+    return d_storage->data_.get()->size();
 }
-size_t const& storage::operator[](size_t const index) const
+size_t const& storage::operator[](size_t index) const
 {
-    if (is_small())
+    if (size_ < 2)
         return s_storage;
-    return d_storage->data_.at(index);
+    return d_storage->data_.get()->at(index);
 }
-size_t& storage::operator[](size_t const index)
+size_t& storage::operator[](size_t index)
 {
-    if (is_small())
+    if (size_ < 2)
         return s_storage;
-    detach();
-    return d_storage->data_.at(index);
+    d_storage->detach();
+    return d_storage->data_.get()->at(index);
 }
 size_t const& storage::back() const
 {
-    if (is_small())
+    if (size_ < 2)
         return s_storage;
-    return d_storage->data_.back();
+    return d_storage->data_.get()->back();
 }
 size_t& storage::back()
 {
-    if (is_small())
+    if (size_ < 2)
         return s_storage;
-    detach();
-    return d_storage->data_.back();
+    d_storage->detach();
+    return d_storage->data_.get()->back();
 }
-void storage::push_back(size_t const element)
+void storage::push_back(size_t element)
 {
-    if (is_small())
+    if (size_ == 0)
     {
-        if (small == 0)
-        {
-            s_storage = element;
-            small = 1;
-        }
-        else
-        {
-            size_t old = s_storage;
-            d_storage = new shared_vector(1, old);
-            d_storage->data_.push_back(element);
-            small = 2;
-        }
+        s_storage = element;
+        size_ = 1;
+    }
+    else if (size_ == 1)
+    {
+        size_t old = s_storage;
+        d_storage = new shared_vector(1, old);
+        d_storage->data_.get()->push_back(element);
+        size_ = 2;
     }
     else
     {
-        detach();
-        d_storage->data_.push_back(element);
+        d_storage->detach();
+        d_storage->data_.get()->push_back(element);
     }
 }
 void storage::pop_back()
 {
-    if (!is_small())
+    if (size_ == 0)
+        return;
+    if (size_ == 1)
     {
-        detach();
-        d_storage->data_.pop_back();
+        s_storage = 0;
+        size_ = 0;
     }
     else
-        small = 0;
+    {
+        d_storage->detach();
+        d_storage->data_.get()->pop_back();
+        if (d_storage->data_.get()->size() == 1)
+        {
+            size_t old = d_storage->data_.get()->back();
+            s_storage = old;
+            size_ = 1;
+        }
+    }
 }
 bool storage::empty() const
 {
-    return small == 0;
+    return size_ == 0;
 }
-void storage::erase(size_t const first, size_t const last)
+void storage::erase(size_t const begin, size_t const end)
 {
-    if (small == 1)
-        small = 0;
-    else if (!is_small())
+    if (size_ > 1)
     {
-        detach();
-        d_storage->data_.erase(d_storage->data_.begin() + first, d_storage->data_.begin() + first + last);
+        d_storage->detach();
+        d_storage->data_.get()->erase(d_storage->data_.get()->begin() + begin, d_storage->data_.get()->begin() + begin + end);
+        if (d_storage->data_.get()->size() == 1)
+        {
+            size_t old = d_storage->data_.get()->back();
+            s_storage = old;
+            size_ = 1;
+        }
+    }
+    else if (size_ == 1 && end != 0)
+    {
+        s_storage = 0;
+        size_ = 0;
     }
 }
-void storage::insert(size_t const first, size_t const amount, size_t const element)
+void storage::insert(size_t const begin, size_t const size, size_t const element)
 {
-    if (small == 0 && amount == 1)
+    if (size == 0)
+        return;
+    if (size_ == 0)
     {
-        small = 1;
-        s_storage = element;
+        if (size == 1)
+        {
+            s_storage = element;
+            size_ = 1;
+        }
+        else
+        {
+            d_storage = new shared_vector(size, element);
+            size_ = 2;
+        }
     }
-    else if (small == 1)
+    else if (size_ == 1)
     {
         size_t old = s_storage;
         d_storage = new shared_vector(1, old);
-        d_storage->data_.insert(d_storage->data_.begin() + first, amount, element);
-        small = 2;
+        d_storage->data_.get()->insert(d_storage->data_.get()->begin() + begin, size, element);
+        size_ = 2;
     }
     else
     {
-        detach();
-        d_storage->data_.insert(d_storage->data_.begin() + first, amount, element);
+        d_storage->detach();
+        d_storage->data_.get()->insert(d_storage->data_.get()->begin() + begin, size, element);
     }
+}
+bool operator==(storage const& left, storage const& right)
+{
+    if (left.size() != right.size())
+        return false;
+    for (size_t i = 0; i != left.size(); ++i)
+        if (left[i] != right[i])
+            return false;
+    return true;
+}
+bool operator!=(storage const& left, storage const& right)
+{
+    return !(left == right);
 }
