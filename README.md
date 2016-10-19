@@ -7,4 +7,4 @@
 * [Assembly](https://github.com/karavaevitalii/university-cpp-course/tree/master/spring-2016/asm)
 
 ###Fall 2016
-* [Big Intger optimizations](https://github.com/karavaevitalii/university-cpp-course/tree/master/fall-2016/big-integer)
+* [Big Integer optimizations](https://github.com/karavaevitalii/university-cpp-course/tree/master/fall-2016/big-integer)
