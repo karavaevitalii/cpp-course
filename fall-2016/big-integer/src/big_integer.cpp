@@ -72,7 +72,7 @@ big_integer::big_integer(std::string const& str)
 }
 big_integer::~big_integer()
 { }
-big_integer& big_integer::operator =(big_integer const& that)
+big_integer& big_integer::operator=(big_integer const& that)
 {
     sign_ = that.sign_;
     data_ = that.data_;
@@ -109,31 +109,32 @@ int big_integer::compare(big_integer const& that) const
     else
         return -ret;
 }
-bool operator ==(big_integer const& left, big_integer const& right)
+bool operator==(big_integer const& left, big_integer const& right)
 {
     return left.compare(right) == 0;
 }
-bool operator !=(big_integer const& left, big_integer const& right)
+bool operator!=(big_integer const& left, big_integer const& right)
 {
     return !(left == right);
 }
-bool operator >(big_integer const& left, big_integer const& right)
+bool operator>(big_integer const& left, big_integer const& right)
 {
     return left.compare(right) == 1;
 }
-bool operator >=(big_integer const& left, big_integer const& right)
+bool operator>=(big_integer const& left, big_integer const& right)
 {
     return left.compare(right) >= 0;
 }
-bool operator <(big_integer const& left, big_integer const& right)
+bool operator<(big_integer const& left, big_integer const& right)
 {
     return left.compare(right) == -1;
 }
-bool operator <=(big_integer const& left, big_integer const& right)
+bool operator<=(big_integer const& left, big_integer const& right)
 {
     return left.compare(right) <= 0;
 }
-void big_integer::trim() {
+void big_integer::trim()
+{
     while (!data_.empty() && data_.back() == 0)
         data_.pop_back();
     if (data_.empty())
@@ -200,11 +201,11 @@ void big_integer::sub_unsigned(big_integer const& rhs)
         this->data_[i] = static_cast<size_t>(result);
     }
 }
-big_integer big_integer::operator +() const
+big_integer big_integer::operator+() const
 {
     return *this;
 }
-big_integer big_integer::operator -() const
+big_integer big_integer::operator-() const
 {
     if (*this == 0)
         return *this;
@@ -212,7 +213,7 @@ big_integer big_integer::operator -() const
     ret.sign_ = !ret.sign_;
     return ret;
 }
-big_integer& big_integer::operator +=(big_integer const& rhs)
+big_integer& big_integer::operator+=(big_integer const& rhs)
 {
     if (rhs.is_zero())
         return *this;
@@ -238,12 +239,12 @@ big_integer& big_integer::operator +=(big_integer const& rhs)
     this->trim();
     return *this;
 }
-big_integer operator +(big_integer left, const big_integer& right)
+big_integer operator+(big_integer left, const big_integer& right)
 {
     left += right;
     return left;
 }
-big_integer& big_integer::operator ++()
+big_integer& big_integer::operator++()
 {
     if (*this > 0)
         add_long_short(1);
@@ -252,13 +253,13 @@ big_integer& big_integer::operator ++()
     return *this;
 
 }
-big_integer big_integer::operator ++(int)
+big_integer big_integer::operator++(int)
 {
     big_integer ret(*this);
     ++ret;
     return ret;
 }
-big_integer& big_integer::operator -=(big_integer const& rhs)
+big_integer& big_integer::operator-=(big_integer const& rhs)
 {
     if (rhs.is_zero())
         return *this;
@@ -284,12 +285,12 @@ big_integer& big_integer::operator -=(big_integer const& rhs)
     this->trim();
     return *this;
 }
-big_integer operator -(big_integer left, const big_integer& right)
+big_integer operator-(big_integer left, const big_integer& right)
 {
     left -= right;
     return left;
 }
-big_integer& big_integer::operator --()
+big_integer& big_integer::operator--()
 {
     if (*this < 0)
         add_long_short(1);
@@ -297,16 +298,16 @@ big_integer& big_integer::operator --()
         sub_long_short(1);
     return *this;
 }
-big_integer big_integer::operator --(int)
+big_integer big_integer::operator--(int)
 {
     big_integer ret(*this);
     --ret;
     return ret;
 }
-big_integer& big_integer::operator <<=(int shift)
+big_integer& big_integer::operator<<=(int shift)
 {
     size_t insert = static_cast<size_t>(shift) / std::numeric_limits<size_t>::digits;
-    data_.insert(0, insert, 0);
+    data_.insert_to_begin(insert, 0);
     size_t shl = static_cast<size_t>(shift) % std::numeric_limits<size_t>::digits;
     if (shl != 0)
     {
@@ -318,17 +319,17 @@ big_integer& big_integer::operator <<=(int shift)
     trim();
     return *this;
 }
-big_integer operator <<(big_integer number, int shift)
+big_integer operator<<(big_integer number, int shift)
 {
     number <<= shift;
     return number;
 }
-big_integer& big_integer::operator >>=(int shift)
+big_integer& big_integer::operator>>=(int shift)
 {
     size_t del = static_cast<size_t>(shift) / std::numeric_limits<size_t>::digits;
     if (del > data_.size())
         return *this = 0;
-    data_.erase(0, del);
+    data_.erase_from_begin(del);
     size_t shr = static_cast<size_t>(shift) % std::numeric_limits<size_t>::digits;
     if (shr != 0)
     {
@@ -342,7 +343,7 @@ big_integer& big_integer::operator >>=(int shift)
         add_long_short(1);
     return *this;
 }
-big_integer operator >>(big_integer number, int shift)
+big_integer operator>>(big_integer number, int shift)
 {
     number >>= shift;
     return number;
@@ -363,16 +364,15 @@ big_integer big_integer::mul_long_short_return(size_t const x) const
     ret.trim();
     return ret;
 }
-big_integer& big_integer::operator *=(big_integer const& rhs)
+big_integer& big_integer::operator*=(big_integer const& rhs)
 {
     this->sign_ = this->sign_ == rhs.sign_;
     big_integer result(this->mul_long_short_return(rhs.data_[0]));
-    for (size_t i = 1; i != rhs.data_.size(); ++i) {
+    for (size_t i = 1; i != rhs.data_.size(); ++i)
         result += this->mul_long_short_return(rhs.data_[i]) << std::numeric_limits<size_t>::digits * i;
-    }
     return *this = result;
 }
-big_integer operator *(big_integer left, const big_integer& right)
+big_integer operator*(big_integer left, const big_integer& right)
 {
     left *= right;
     return left;
@@ -425,8 +425,8 @@ big_integer& big_integer::operator/=(big_integer const& rhs)
     for (size_t i = m; i != 0; --i)
     {
         result = ((static_cast<u128>(n + i - 1 < this->data_.size() ? this->data_[n + i - 1] : 0)
-            << std::numeric_limits<size_t>::digits) +
-            this->data_[n + i - 2]) /
+            << std::numeric_limits<size_t>::digits)
+            + this->data_[n + i - 2]) /
             static_cast<u128>(divisor.data_.back());
         quotient.data_[i - 1] = static_cast<size_t>((std::min(result, static_cast<u128>(std::numeric_limits<size_t>::max()))));
         *this -= divisor.mul_long_short_return(quotient.data_[i - 1]) << (std::numeric_limits<size_t>::digits * (i - 1));
@@ -440,16 +440,16 @@ big_integer& big_integer::operator/=(big_integer const& rhs)
     quotient.trim();
     return *this = quotient;
 }
-big_integer operator /(big_integer left, const big_integer& right)
+big_integer operator/(big_integer left, const big_integer& right)
 {
     left /= right;
     return left;
 }
-big_integer& big_integer::operator %=(const big_integer& rhs)
+big_integer& big_integer::operator%=(const big_integer& rhs)
 {
     return *this -= (*this / rhs * rhs);
 }
-big_integer operator %(big_integer left, const big_integer& right)
+big_integer operator%(big_integer left, const big_integer& right)
 {
     left %= right;
     return left;
@@ -472,7 +472,7 @@ void big_integer::decode()
             data_[i] = ~data_[i];
     }
 }
-big_integer& big_integer::operator &=(const big_integer& rhs)
+big_integer& big_integer::operator&=(const big_integer& rhs)
 {
     big_integer that(rhs);
     while (this->data_.size() > that.data_.size())
@@ -489,12 +489,12 @@ big_integer& big_integer::operator &=(const big_integer& rhs)
     this->trim();
     return *this;
 }
-big_integer operator &(big_integer left, const big_integer& right)
+big_integer operator&(big_integer left, const big_integer& right)
 {
     left &= right;
     return left;
 }
-big_integer& big_integer::operator |=(const big_integer& rhs)
+big_integer& big_integer::operator|=(const big_integer& rhs)
 {
     big_integer that(rhs);
     while (this->data_.size() > that.data_.size())
@@ -511,12 +511,12 @@ big_integer& big_integer::operator |=(const big_integer& rhs)
     this->trim();
     return *this;
 }
-big_integer operator |(big_integer left, const big_integer& right)
+big_integer operator|(big_integer left, const big_integer& right)
 {
     left |= right;
     return left;
 }
-big_integer& big_integer::operator ^=(const big_integer& rhs)
+big_integer& big_integer::operator^=(const big_integer& rhs)
 {
     big_integer that(rhs);
     while (this->data_.size() > that.data_.size())
@@ -533,12 +533,12 @@ big_integer& big_integer::operator ^=(const big_integer& rhs)
     this->trim();
     return *this;
 }
-big_integer operator ^(big_integer left, const big_integer& right)
+big_integer operator^(big_integer left, const big_integer& right)
 {
     left ^= right;
     return left;
 }
-big_integer big_integer::operator ~() const
+big_integer big_integer::operator~() const
 {
     big_integer ret(*this);
     ret.sub_long_short(1);
@@ -561,7 +561,7 @@ std::string to_string(big_integer const& a)
     std::reverse(result.begin(), result.end());
     return result;
 }
-std::ostream& operator <<(std::ostream &ostream, big_integer const& a)
+std::ostream& operator <<(std::ostream& ostream, big_integer const& a)
 {
     return ostream << to_string(a);
 }
