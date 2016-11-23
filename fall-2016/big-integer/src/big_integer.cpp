@@ -369,7 +369,7 @@ big_integer& big_integer::operator*=(big_integer const& rhs)
     this->sign_ = this->sign_ == rhs.sign_;
     big_integer result(this->mul_long_short_return(rhs.data_[0]));
     for (size_t i = 1; i != rhs.data_.size(); ++i)
-        result += this->mul_long_short_return(rhs.data_[i]) << std::numeric_limits<size_t>::digits * i;
+        result += this->mul_long_short_return(rhs.data_[i]) << static_cast<int>(std::numeric_limits<size_t>::digits * i);
     return *this = result;
 }
 big_integer operator*(big_integer left, const big_integer& right)
@@ -416,9 +416,9 @@ big_integer& big_integer::operator/=(big_integer const& rhs)
     size_t n = divisor.data_.size();
     big_integer quotient;
     quotient.data_.resize(m + 1);
-    if (*this >= divisor << (std::numeric_limits<size_t>::digits * m))
+    if (*this >= divisor << static_cast<int>(std::numeric_limits<size_t>::digits * m))
     {
-        *this -= divisor << (std::numeric_limits<size_t>::digits * m);
+        *this -= divisor << static_cast<int>(std::numeric_limits<size_t>::digits * m);
         quotient.data_.back() = 1;
     }
     u128 result = 0;
@@ -429,11 +429,11 @@ big_integer& big_integer::operator/=(big_integer const& rhs)
             + this->data_[n + i - 2]) /
             static_cast<u128>(divisor.data_.back());
         quotient.data_[i - 1] = static_cast<size_t>((std::min(result, static_cast<u128>(std::numeric_limits<size_t>::max()))));
-        *this -= divisor.mul_long_short_return(quotient.data_[i - 1]) << (std::numeric_limits<size_t>::digits * (i - 1));
+        *this -= divisor.mul_long_short_return(quotient.data_[i - 1]) << static_cast<int>(std::numeric_limits<size_t>::digits * (i - 1));
         while (*this < 0)
         {
             --quotient.data_[i - 1];
-            *this += divisor << (std::numeric_limits<size_t>::digits * (i - 1));
+            *this += divisor << static_cast<int>(std::numeric_limits<size_t>::digits * (i - 1));
         }
     }
     quotient.sign_ = flag_sign;
