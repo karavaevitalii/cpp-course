@@ -25,7 +25,7 @@ psn& psn::operator=(psn const& that)
     return *this;
 }
 
-std::shared_ptr<psn> psn::find(value_type target)
+std::shared_ptr<psn> psn::find(value_type const& target)
 {
     if (this == nullptr)
         return nullptr;
@@ -38,7 +38,7 @@ std::shared_ptr<psn> psn::find(value_type target)
         return right_->find(target);
 }
 
-std::shared_ptr<psn> psn::insert(value_type target)
+std::shared_ptr<psn> psn::insert(value_type const& target)
 {
     if (data_ > target)
     {
@@ -70,7 +70,7 @@ std::shared_ptr<psn> psn::insert(value_type target)
     }
 }
 
-void psn::erase(std::shared_ptr<node> target, std::shared_ptr<node> parent)
+void psn::erase(std::shared_ptr<node> const& target, std::shared_ptr<node> const& parent)
 {
     if (data_ > target->data_)
     {
@@ -113,7 +113,7 @@ void psn::erase(std::shared_ptr<node> target, std::shared_ptr<node> parent)
     }
 }
 
-std::shared_ptr<psn> psn::next(std::shared_ptr<node> target)
+std::shared_ptr<psn> psn::next(std::shared_ptr<node> const& target)
 {
     if (data_ >= target->data_)
     {
@@ -135,7 +135,7 @@ std::shared_ptr<psn> psn::next(std::shared_ptr<node> target)
     return right_->next(target);
 }
 
-std::shared_ptr<psn> psn::prev(std::shared_ptr<node> target)
+std::shared_ptr<psn> psn::prev(std::shared_ptr<node> const& target)
 {
     if (data_ > target->data_)
     {
@@ -156,60 +156,60 @@ std::shared_ptr<psn> psn::prev(std::shared_ptr<node> target)
     return ret;
 }
 
-psi::iterator(std::shared_ptr<psn> el, std::shared_ptr<psn> root)
-    : el_(el)
+psi::iterator(std::shared_ptr<psn> const& el, std::shared_ptr<psn> const& root)
+    : it_(el)
     , root_(root)
 {}
 
 psi::iterator(psi const& that)
-    : el_(that.el_)
+    : it_(that.it_)
     , root_(that.root_)
 {}
 
 psi& psi::operator=(psi const& that)
 {
-    el_ = that.el_;
+    it_ = that.it_;
     root_ = that.root_;
     return *this;
 }
 
 ps::value_type const& psi::operator*() const
 {
-    return el_->data_;
+    return it_->data_;
 }
 
 psi& psi::operator++()
 {
-    if (el_->right_)
+    if (it_->right_)
     {
-        el_ = el_->right_;
+        it_ = it_->right_;
         std::shared_ptr<psn> p;
-        while (el_->left_)
+        while (it_->left_)
         {
-            p = el_->left_;
-            el_ = p;
+            p = it_->left_;
+            it_ = p;
         }
     }
     else
-        el_ = root_->next(el_);
+        it_ = root_->next(it_);
 
     return *this;
 }
 
 psi& psi::operator--()
 {
-    if (el_->left_)
+    if (it_->left_)
     {
-        el_ = el_->left_;
+        it_ = it_->left_;
         std::shared_ptr<psn> p;
-        while (el_->right_)
+        while (it_->right_)
         {
-            p = el_->right_;
-            el_ = p;
+            p = it_->right_;
+            it_ = p;
         }
     }
     else
-        el_ = root_->prev(el_);
+        it_ = root_->prev(it_);
 
     return *this;
 }
@@ -228,82 +228,75 @@ psi psi::operator--(int)
     return ret;
 }
 
-bool operator==(psi left, psi right)
+bool operator==(psi const& left, psi const& right)
 {
-    return left.el_->data_ == right.el_->data_;
+    return left.it_->data_ == right.it_->data_;
 }
 
-bool operator!=(psi left, psi right)
+bool operator!=(psi const& left, psi const& right)
 {
     return !(left == right);
 }
 
 psi ps::begin() const
 {
-    std::shared_ptr<psn> p = root;
+    std::shared_ptr<psn> p = fake_root_;
     while (p->left_)
         p = p->left_;
 
-    return iterator(p, root);
+    return iterator(p, fake_root_);
 }
 
 psi ps::end() const
 {
-    std::shared_ptr<psn> p = root;
+    std::shared_ptr<psn> p = fake_root_;
     while (p->right_)
         p = p->right_;
 
-    return iterator(p, root);
+    return iterator(p, fake_root_);
 }
 
 ps::persistent_set()
-    : root(std::make_shared<psn>(std::numeric_limits<int>::max()))
+    : fake_root_(std::make_shared<psn>(std::numeric_limits<int>::max()))
 {}
 
 ps::persistent_set(persistent_set const& that)
-    : root(std::make_shared<psn>(that.root))
+    : fake_root_(std::make_shared<psn>(that.fake_root_))
 {}
 
 ps::~persistent_set()
 {
-    root.reset();
+    fake_root_.reset();
 }
 
 persistent_set& ps::operator=(persistent_set const& that)
 {
-    root = that.root;
+    fake_root_ = that.fake_root_;
     return *this;
 }
 
-psi ps::find(value_type target)
+psi ps::find(value_type const& target)
 {
-    std::shared_ptr<psn> found = root->find(target);
+    std::shared_ptr<psn> found = fake_root_->find(target);
 
     if (!found)
         return end();
 
-    return iterator(found, root);
+    return iterator(found, fake_root_);
 }
 
-std::pair<psi, bool> ps::insert(ps::value_type target)
+std::pair<psi, bool> ps::insert(ps::value_type const& target)
 {
     psi found = find(target);
 
     if (found != end())
         return {found, false};
 
-    found = iterator(root->insert(target), root);
+    found = iterator(fake_root_->insert(target), fake_root_);
     return {found, true};
 }
 
-void ps::erase(psi target)
+void ps::erase(psi const& target)
 {
-    root->erase(target.el_, root);
+    fake_root_->erase(target.it_, fake_root_);
 }
-
-
-
-
-
-
-

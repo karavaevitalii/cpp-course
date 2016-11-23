@@ -16,10 +16,10 @@ set(SRC_FILES src/big_integer.cpp
 add_executable(big_integer_testing ${SRC_FILES})
 
 set(TEST_FILES src/big_integer.cpp
-        includes/big_integer.h
+                includes/big_integer.h
 		src/storage.cpp
 		includes/storage.h
-        test/test.cpp)
+                test/test.cpp)
 
 add_executable(local_test ${TEST_FILES})
 

@@ -1,0 +1,1 @@
+/usr/bin/c++    -std=c++11 -g -Wall -Wextra -pedantic -Wformat=2     -Wfloat-equal -Wconversion -Wlogical-op -Wcast-qual -Wcast-align -fsanitize=address -fstack-protector -lmcheck   CMakeFiles/local_test.dir/src/big_integer.cpp.o CMakeFiles/local_test.dir/src/storage.cpp.o CMakeFiles/local_test.dir/test/test.cpp.o  -o local_test 

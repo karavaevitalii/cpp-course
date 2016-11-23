@@ -1,0 +1,4 @@
+/home/karavaevitalii/Education/university-cpp-course/fall-2016/big-integer/Debug/CMakeFiles/rebuild_cache.dir
+/home/karavaevitalii/Education/university-cpp-course/fall-2016/big-integer/Debug/CMakeFiles/edit_cache.dir
+/home/karavaevitalii/Education/university-cpp-course/fall-2016/big-integer/Debug/CMakeFiles/local_test.dir
+/home/karavaevitalii/Education/university-cpp-course/fall-2016/big-integer/Debug/CMakeFiles/big_integer_testing.dir
