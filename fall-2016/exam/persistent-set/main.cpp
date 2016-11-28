@@ -29,6 +29,10 @@ int main()
         s.insert(2 * i);
 
     for (int i = 0; i != 10; ++i)
+        cout << *s.find(i) << ' ';
+    cout << '\n';
+
+    for (int i = 0; i != 10; ++i)
     {
         cout << *s.find(i * 2) << ' ';
         s.erase(s.find(i * 2));

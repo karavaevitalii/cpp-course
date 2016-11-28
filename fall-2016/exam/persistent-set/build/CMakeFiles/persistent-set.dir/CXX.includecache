@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/karavaevitalii/Education/university-cpp-course/fall-2016/exam/persistent-set/main.cpp
+iostream
+-
+persistent_set.h
+/home/karavaevitalii/Education/university-cpp-course/fall-2016/exam/persistent-set/persistent_set.h
+
+/home/karavaevitalii/Education/university-cpp-course/fall-2016/exam/persistent-set/persistent_set.cpp
+persistent_set.h
+/home/karavaevitalii/Education/university-cpp-course/fall-2016/exam/persistent-set/persistent_set.h
+limits
+-
+
+/home/karavaevitalii/Education/university-cpp-course/fall-2016/exam/persistent-set/persistent_set.h
+memory
+-
+

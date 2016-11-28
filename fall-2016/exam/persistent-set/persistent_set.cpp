@@ -27,15 +27,18 @@ psn& psn::operator=(psn const& that)
 
 std::shared_ptr<psn> psn::find(value_type const& target)
 {
-    if (this == nullptr)
-        return nullptr;
-
     if (data_ > target)
-        return left_->find(target);
+        if (!left_)
+            return nullptr;
+        else
+            return left_->find(target);
     else if (data_ == target)
         return shared_from_this();
     else
-        return right_->find(target);
+        if (!right_)
+            return nullptr;
+        else
+            return right_->find(target);
 }
 
 std::shared_ptr<psn> psn::insert(value_type const& target)
@@ -265,9 +268,7 @@ ps::persistent_set(persistent_set const& that)
 {}
 
 ps::~persistent_set()
-{
-    fake_root_.reset();
-}
+{}
 
 persistent_set& ps::operator=(persistent_set const& that)
 {

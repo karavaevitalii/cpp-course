@@ -1,0 +1,1 @@
+/usr/bin/c++    -std=c++14   CMakeFiles/persistent-set.dir/main.cpp.o CMakeFiles/persistent-set.dir/persistent_set.cpp.o  -o persistent-set 
