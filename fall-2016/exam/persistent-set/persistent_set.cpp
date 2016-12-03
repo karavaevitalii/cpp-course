@@ -44,7 +44,6 @@ std::shared_ptr<psn> psn::find(value_type const& target)
 std::shared_ptr<psn> psn::insert(value_type const& target)
 {
     if (data_ > target)
-    {
         if (!left_)
         {
             left_ = std::make_shared<psn>(target);
@@ -55,11 +54,9 @@ std::shared_ptr<psn> psn::insert(value_type const& target)
             left_ = std::make_shared<node>(left_);
             return left_->insert(target);
         }
-    }
     else if (data_ == target)
         return shared_from_this();
     else
-    {
         if (!right_)
         {
             right_ = std::make_shared<psn>(target);
@@ -70,7 +67,6 @@ std::shared_ptr<psn> psn::insert(value_type const& target)
             right_ = std::make_shared<psn>(right_);
             return right_->insert(target);
         }
-    }
 }
 
 void psn::erase(std::shared_ptr<node> const& target, std::shared_ptr<node> const& parent)
@@ -95,19 +91,15 @@ void psn::erase(std::shared_ptr<node> const& target, std::shared_ptr<node> const
             right_ = nullptr;
         }
         if (parent->right_ != shared_from_this())
-        {
             if (!left_)
                 parent->left_ = right_;
             else
                 parent->left_ = left_;
-        }
         else
-        {
             if (!right_)
                 parent->right_ = left_;
             else
                 parent->right_ = right_;
-        }
     }
     else
     {
