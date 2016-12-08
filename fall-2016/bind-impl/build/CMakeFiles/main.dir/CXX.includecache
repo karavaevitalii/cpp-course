@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/karavaevitalii/Education/university-cpp-course/fall-2016/bind-impl/bind.h
+tuple
+-
+
+/home/karavaevitalii/Education/university-cpp-course/fall-2016/bind-impl/main.cpp
+iostream
+-
+bind.h
+/home/karavaevitalii/Education/university-cpp-course/fall-2016/bind-impl/bind.h
+

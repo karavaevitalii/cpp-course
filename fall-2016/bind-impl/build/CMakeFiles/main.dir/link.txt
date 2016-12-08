@@ -1,0 +1,1 @@
+/usr/bin/c++    -std=c++14 -g -Wall -Werror -Wextra -pedantic -Wformat=2     -Wfloat-equal -Wconversion -Wlogical-op -Wcast-qual -Wcast-align -fsanitize=address -fstack-protector -lmcheck   CMakeFiles/main.dir/main.cpp.o  -o main 
