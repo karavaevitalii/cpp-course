@@ -24,11 +24,12 @@ int g(int a, int b)
 
 int main()
 {
-    auto b = bind(F(), (*f)(2, 3), (*g)(2, 3));
-    auto c = bind(&f, (*g)(2, 3), (*f)(2, 3));
-    cout << b() << endl;
-    cout << F()(2, 3) << endl;
-    cout << f((*g)(2, 3), f(2, 3)) << endl;
+    auto a = bind(F(), (*f)(2, 3), (*g)(2, 3));
+    auto b = bind(&f, (*g)(2, 3), (*f)(2, 3));
+    cout << (a() == F()(2, 3)) << endl;
+    cout << (f((*g)(2, 3), f(2, 3)) == b()) << endl;
+
+    auto c = bind(&f, bind(F(), 2, 3), a);
     cout << c() << endl;
     return 0;
 }

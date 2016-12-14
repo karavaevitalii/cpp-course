@@ -2,6 +2,7 @@
 #define BIND_H
 
 #include <tuple>
+#include <functional>
 
 template<typename F, typename ... Args>
 struct binder
@@ -12,16 +13,28 @@ struct binder
     }
 
 private:
-    /*typename std::decay<F>::type*/F func;
+    typename std::decay<F>::type func;
     std::tuple<Args ...> args;
-
-    template<typename Fn, typename ... T>
-    friend binder<Fn, T ...> bind(Fn const& f, T&& ... t);
 
     binder(F const& func, Args&& ... args)
         : func(func)
         , args(std::forward<Args>(args) ...)
     {}
+
+    template<typename Fn, typename ... T>
+    friend binder<Fn, T ...> bind(Fn const& f, T&& ... t);
+
+    template<typename Arg>
+    auto getarg(Arg const&& arg) const
+    {
+        return arg;
+    }
+
+    template<typename FF, typename ... Args1, typename ... Args2>
+    auto getarg(binder<FF, Args1 ...> const&& b, Args2&& ... args) const
+    {
+        return b(std::forward<Args2>(args) ...);
+    }
 
     template<typename FF, typename T, bool Pred, size_t A, size_t ... N>
     struct caller
@@ -40,7 +53,7 @@ private:
     {
         static auto call(FF&& f, T&& t)
         {
-            return f(std::get<N>(std::forward<T>(t)) ...);
+            return f(getarg(std::get<N>(std::forward<T>(t)) ...));
         }
     };
 
