@@ -10,15 +10,15 @@ namespace bind
     struct placeholder
     {};
 
-    constexpr placeholder<0> _1;
-    constexpr placeholder<1> _2;
-    constexpr placeholder<2> _3;
+    placeholder<0> _1;
+    placeholder<1> _2;
+    placeholder<2> _3;
 
     template<typename F, typename ... Args>
     struct bind_t
     {
         template<typename ... Args1>
-        auto operator()(Args1&& ... args1) const
+        constexpr auto operator()(Args1&& ... args1)
         {
             return call(typename geter<std::tuple_size<tuple_t>::value>::next()
                         , std::forward<Args1>(args1) ...);
@@ -34,19 +34,19 @@ namespace bind
         {}
 
         template<typename Arg, typename ... Args1>
-        auto&& getarg(Arg const& arg, Args1& ...) const
+        constexpr auto&& getarg(Arg& arg, Args1& ...)
         {
             return arg;
         }
 
         template<size_t N, typename ... Args1>
-        auto&& getarg(placeholder<N> const&, Args1& ... args1) const
+        constexpr auto&& getarg(placeholder<N>&, Args1& ... args1)
         {
             return std::get<N>(std::forward_as_tuple(args1 ...));
         }
 
         template<typename B, typename ... Args1, typename ... Args2>
-        auto getarg(bind_t<B, Args1 ...> const& b, Args2& ... args2) const
+        constexpr auto getarg(bind_t<B, Args1 ...>& b, Args2& ... args2)
         {
             return b(args2 ...);
         }
@@ -68,7 +68,7 @@ namespace bind
         };
 
         template<size_t ... N, typename ... Args1>
-        auto call(arguments<N ...> const&, Args1&& ... args1) const
+        constexpr auto call(arguments<N ...> const&, Args1&& ... args1)
         {
             return func(getarg(std::get<N>(args), args1 ...) ...);
         }

@@ -27,7 +27,7 @@ int main()
     };
     auto b = bind::bind(a, bind::bind(F()), bind::bind(F()));
     auto c = bind::bind(f, 4, 5);
-    auto e = bind::bind(g, bind::_1, bind::_2);
+    auto e = bind::bind(&g, bind::_1, bind::_2);
     std::cout << b() << '\n';
     std::cout << c() << '\n';
     std::cout << e(3, 4) << '\n';
@@ -38,6 +38,8 @@ int main()
 
     int x = 5;
     auto bb = bind::bind(f, x);
+    bb();
+    bb();
     std::cout << x << '\n';
 
     return 0;
