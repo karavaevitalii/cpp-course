@@ -4,7 +4,7 @@
 
 struct F
 {
-    int operator()() const
+    int operator()()
     {
         return  4;
     }
@@ -20,6 +20,11 @@ int g(int a, int b)
     return a * b;
 }
 
+int sum(int a, int b)
+{
+    return a + b;
+}
+
 int main()
 {
     auto a = [](int a, int b) {
@@ -27,7 +32,7 @@ int main()
     };
     auto b = bind::bind(a, bind::bind(F()), bind::bind(F()));
     auto c = bind::bind(f, 4, 5);
-    auto e = bind::bind(&g, bind::_1, bind::_2);
+    auto e = bind::bind(g, bind::placeholder::_1, bind::placeholder::_2);
     std::cout << b() << '\n';
     std::cout << c() << '\n';
     std::cout << e(3, 4) << '\n';
@@ -41,6 +46,15 @@ int main()
     bb();
     bb();
     std::cout << x << '\n';
+
+    namespace bp = bind::placeholder;
+
+    std::cout << (bind::bind(&sum, 5, -5))() << std::endl;
+    std::cout << (bind::bind(&sum, bp::_1, 5))(-5) << std::endl;
+    std::cout << (bind::bind(&sum, bp::_1, bp::_1))(0) << std::endl;
+    std::cout << (bind::bind(&sum, bp::_2, bp::_2))(10, 0) << std::endl;
+    std::cout << (bind::bind(&sum, bp::_2, bp::_1))(5, -5) << std::endl;
+    std::cout << (bind::bind(&sum, bind::bind(&sum, bp::_2, 10), bp::_1))(5, -15) << std::endl;
 
     return 0;
 }
