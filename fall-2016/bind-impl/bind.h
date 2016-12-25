@@ -4,75 +4,87 @@
 #include <tuple>
 #include <functional>
 
-template<typename F, typename ... Args>
-struct binder
+namespace bind
 {
-    auto operator()()
+    template<size_t N>
+    struct placeholder
+    {};
+
+    constexpr placeholder<0> _1;
+    constexpr placeholder<1> _2;
+    constexpr placeholder<2> _3;
+
+    template<typename F, typename ... Args>
+    struct bind_t
     {
-        return call(func, args);
-    }
-
-private:
-    typename std::decay<F>::type func;
-    std::tuple<Args ...> args;
-
-    binder(F const& func, Args&& ... args)
-        : func(func)
-        , args(std::forward<Args>(args) ...)
-    {}
-
-    template<typename Fn, typename ... T>
-    friend binder<Fn, T ...> bind(Fn const& f, T&& ... t);
-
-    template<typename Arg>
-    auto getarg(Arg const&& arg) const
-    {
-        return arg;
-    }
-
-    template<typename FF, typename ... Args1, typename ... Args2>
-    auto getarg(binder<FF, Args1 ...> const&& b, Args2&& ... args) const
-    {
-        return b(std::forward<Args2>(args) ...);
-    }
-
-    template<typename FF, typename T, bool Pred, size_t A, size_t ... N>
-    struct caller
-    {
-        static auto call(FF&& f, T&& t)
+        template<typename ... Args1>
+        auto operator()(Args1&& ... args1) const
         {
-            return caller<FF, T
-                    , sizeof ... (N) + 1 == A
-                    , A, N ..., sizeof ... (N)>
-                    ::call(f, std::forward<T>(t));
+            return call(typename geter<std::tuple_size<tuple_t>::value>::next()
+                        , std::forward<Args1>(args1) ...);
         }
+
+    private:
+        typedef typename std::decay<F>::type func_t;
+        typedef std::tuple<Args ...> tuple_t;
+
+        bind_t(F&& func, Args&& ... args)
+            : func(std::forward<F>(func))
+            , args(std::forward<Args>(args) ...)
+        {}
+
+        template<typename Arg, typename ... Args1>
+        auto&& getarg(Arg const& arg, Args1& ...) const
+        {
+            return arg;
+        }
+
+        template<size_t N, typename ... Args1>
+        auto&& getarg(placeholder<N> const&, Args1& ... args1) const
+        {
+            return std::get<N>(std::forward_as_tuple(args1 ...));
+        }
+
+        template<typename B, typename ... Args1, typename ... Args2>
+        auto getarg(bind_t<B, Args1 ...> const& b, Args2& ... args2) const
+        {
+            return b(args2 ...);
+        }
+
+        template<size_t ... N>
+        struct arguments
+        {};
+
+        template<size_t N, size_t ... Seq>
+        struct geter
+        {
+            typedef typename geter<N - 1, N - 1, Seq ...>::next next;
+        };
+
+        template<size_t ... Seq>
+        struct geter<0, Seq ...>
+        {
+            typedef arguments<Seq ...> next;
+        };
+
+        template<size_t ... N, typename ... Args1>
+        auto call(arguments<N ...> const&, Args1&& ... args1) const
+        {
+            return func(getarg(std::get<N>(args), args1 ...) ...);
+        }
+
+        template<typename Fn, typename ... Args1>
+        friend bind_t<Fn, Args1 ...> bind(Fn&& f, Args1&& ... args);
+
+        func_t func;
+        tuple_t args;
     };
 
-    template<typename FF, typename T, size_t A, size_t... N>
-    struct caller<FF, T, true, A, N ...>
+    template<typename F, typename ... Args>
+    bind_t<F, Args ...> bind(F&& f, Args&& ... args)
     {
-        static auto call(FF&& f, T&& t)
-        {
-            return f(getarg(std::get<N>(std::forward<T>(t)) ...));
-        }
-    };
-
-    template<typename FF, typename T>
-    auto call(FF&& f, T&& t) const
-    {
-        typedef typename std::decay<T>::type type_t;
-
-        return caller<FF, T
-                , std::tuple_size<type_t>::value == 0
-                , std::tuple_size<type_t>::value>
-                ::call(f, std::forward<T>(t));
+        return bind_t<F, Args ...>(std::forward<F>(f), std::forward<Args>(args) ...);
     }
-};
-
-template<typename F, typename ... Args>
-binder<F, Args ...> bind(F const& f, Args&& ... args)
-{
-    return binder<F, Args ...>(f, std::forward<Args>(args) ...);
 }
 
 #endif

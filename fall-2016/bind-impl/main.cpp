@@ -2,13 +2,11 @@
 
 #include "bind.h"
 
-using namespace std;
-
 struct F
 {
-    int operator()(int a, int b)
+    int operator()() const
     {
-        return  a - b;
+        return  4;
     }
 };
 
@@ -24,12 +22,23 @@ int g(int a, int b)
 
 int main()
 {
-    auto a = bind(F(), (*f)(2, 3), (*g)(2, 3));
-    auto b = bind(&f, (*g)(2, 3), (*f)(2, 3));
-    cout << (a() == F()(2, 3)) << endl;
-    cout << (f((*g)(2, 3), f(2, 3)) == b()) << endl;
+    auto a = [](int a, int b) {
+        return g(a, b);
+    };
+    auto b = bind::bind(a, bind::bind(F()), bind::bind(F()));
+    auto c = bind::bind(f, 4, 5);
+    auto e = bind::bind(g, bind::_1, bind::_2);
+    std::cout << b() << '\n';
+    std::cout << c() << '\n';
+    std::cout << e(3, 4) << '\n';
 
-    auto c = bind(&f, bind(F(), 2, 3), a);
-    cout << c() << endl;
+    auto f = [](int& a){
+        a += 5;
+    };
+
+    int x = 5;
+    auto bb = bind::bind(f, x);
+    std::cout << x << '\n';
+
     return 0;
 }
