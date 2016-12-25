@@ -2,7 +2,6 @@
 #define BIND_H
 
 #include <tuple>
-#include <functional>
 
 namespace bind
 {
