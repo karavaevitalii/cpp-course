@@ -1,1 +1,0 @@
-/usr/bin/c++   -g   CMakeFiles/bind-impl.dir/main.cpp.o  -o bind-impl -rdynamic 
