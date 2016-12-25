@@ -1,3 +1,0 @@
-/home/karavaevitalii/Education/university-cpp-course/fall-2016/exam/persistent-set/build/CMakeFiles/rebuild_cache.dir
-/home/karavaevitalii/Education/university-cpp-course/fall-2016/exam/persistent-set/build/CMakeFiles/edit_cache.dir
-/home/karavaevitalii/Education/university-cpp-course/fall-2016/exam/persistent-set/build/CMakeFiles/persistent-set.dir
