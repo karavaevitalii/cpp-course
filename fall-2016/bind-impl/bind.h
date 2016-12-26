@@ -42,13 +42,13 @@ private:
     {}
 
     template<typename Arg, typename ... Args1>
-    constexpr auto&& getarg(Arg& a, Args1& ...)
+    constexpr Arg& getarg(Arg& a, Args1& ...)
     {
         return a;
     }
 
     template<size_t N, typename ... Args1>
-    constexpr auto&& getarg(placeholder::placeholder<N>&, Args1& ... args1)
+    constexpr auto& getarg(placeholder::placeholder<N>&, Args1& ... args1)
     {
         return std::get<N>(std::forward_as_tuple(args1 ...));
     }
