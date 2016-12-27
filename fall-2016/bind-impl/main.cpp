@@ -42,9 +42,9 @@ int main()
     };
 
     int x = 5;
-    auto bb = bind::bind(f, bind::placeholder::_1);
-    bb(x);
-    bb(x);
+    auto bb = bind::bind(f, x);
+    bb();
+    bb();
     std::cout << x << '\n';
 
     namespace bp = bind::placeholder;
@@ -56,9 +56,16 @@ int main()
     std::cout << (bind::bind(&sum, bp::_2, bp::_1))(5, -5) << std::endl;
     std::cout << (bind::bind(&sum, bind::bind(&sum, bp::_2, 10), bp::_1))(5, -15) << std::endl;
 
-    auto s = [](int a) {return a + 4;};
+    auto s = [](int a) {
+        return a + 4;
+    };
+
     auto d = bind::bind(s, 2);
     std::cout << d() << '\n';
+
+    int xx = 4;
+    bind::bind([](int& x){return x += 4;}, xx);
+    std::cout << xx << '\n';
 
     return 0;
 }

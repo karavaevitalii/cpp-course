@@ -38,7 +38,7 @@ private:
 
     bind_t(F&& func, Args&& ... args)
         : func(std::forward<F>(func))
-        , args(std::forward<Args>(args) ...)
+        , args(std::move(args) ...)
     {}
 
     template<typename Arg, typename ... Args1>
@@ -82,7 +82,7 @@ private:
     }
 
     template<typename Fn, typename ... Args1>
-    friend bind_t<Fn, Args1 ...> bind(Fn&& f, Args1&& ... args);
+    friend bind_t<Fn, Args1 ...> bind(Fn&& f, Args1 ... args);
 
 private:
     func_t func;
@@ -90,9 +90,9 @@ private:
 };
 
 template<typename F, typename ... Args>
-bind_t<F, Args ...> bind(F&& f, Args&& ... args)
+bind_t<F, Args ...> bind(F&& f, Args ... args)
 {
-    return bind_t<F, Args ...>(std::forward<F>(f), std::forward<Args>(args) ...);
+    return bind_t<F, Args ...>(std::forward<F>(f), std::move(args) ...);
 }
 
 }
