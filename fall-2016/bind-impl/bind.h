@@ -33,7 +33,7 @@ struct bind_t
     }
 
 private:
-    typedef typename std::decay<F>::type                  func_t;
+    typedef typename std::decay<F>::type       func_t;
     typedef std::tuple<std::decay_t<Args> ...> tuple_t;
 
     bind_t(F&& func, Args&& ... args)
