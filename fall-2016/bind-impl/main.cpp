@@ -1,12 +1,19 @@
 #include <iostream>
+#include <vector>
 
 #include "bind.h"
 
+template<typename T>
 struct F
 {
+    F(T&&)
+    {
+        std::cout << "move c_tor\n";
+    }
+
     int operator()()
     {
-        return  4;
+        return 2;
     }
 };
 
@@ -30,7 +37,9 @@ int main()
     auto a = [](int a, int b) {
         return g(a, b);
     };
-    auto b = bind::bind(a, bind::bind(F()), bind::bind(F()));
+    auto aa = bind::bind(std::move(F<int>(2)));
+    std::cout << aa() << '\n';
+    auto b = bind::bind(a, bind::bind(F<int>(2)), bind::bind(F<int>(2)));
     auto c = bind::bind(f, 4, 5);
     auto e = bind::bind(g, bind::placeholder::_1, bind::placeholder::_2);
     std::cout << b() << '\n';
@@ -64,7 +73,9 @@ int main()
     std::cout << d() << '\n';
 
     int xx = 4;
-    bind::bind([](int& x){return x += 4;}, xx);
+    bind::bind([](int& x){
+        return x += 4;
+    }, xx);
     std::cout << xx << '\n';
 
     return 0;

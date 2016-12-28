@@ -33,12 +33,12 @@ struct bind_t
     }
 
 private:
-    typedef typename std::decay<F>::type func_t;
-    typedef std::tuple<Args ...>         tuple_t;
+    typedef typename std::decay<F>::type                  func_t;
+    typedef std::tuple<std::decay_t<Args> ...> tuple_t;
 
     bind_t(F&& func, Args&& ... args)
         : func(std::forward<F>(func))
-        , args(std::move(args) ...)
+        , args(std::forward<Args>(args) ...)
     {}
 
     template<typename Arg, typename ... Args1>
@@ -82,7 +82,7 @@ private:
     }
 
     template<typename Fn, typename ... Args1>
-    friend bind_t<Fn, Args1 ...> bind(Fn&& f, Args1 ... args);
+    friend bind_t<Fn, Args1 ...> bind(Fn&& f, Args1&& ... args);
 
 private:
     func_t func;
@@ -90,9 +90,9 @@ private:
 };
 
 template<typename F, typename ... Args>
-bind_t<F, Args ...> bind(F&& f, Args ... args)
+bind_t<F, Args ...> bind(F&& f, Args&& ... args)
 {
-    return bind_t<F, Args ...>(std::forward<F>(f), std::move(args) ...);
+    return bind_t<F, Args ...>(std::forward<F>(f), std::forward<Args>(args) ...);
 }
 
 }
