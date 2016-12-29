@@ -132,9 +132,9 @@ private:
         else if (which == 2)
             reinterpret_cast<Right*>(&data)->Right::~Right();
         else if (which == 3)
-            reinterpret_cast<std::unique_ptr<Left>*>(&data)->release();
+            reinterpret_cast<std::unique_ptr<Left>*>(&data)->~unique_ptr();
         else
-            reinterpret_cast<std::unique_ptr<Right>*>(&data)->release();
+            reinterpret_cast<std::unique_ptr<Right>*>(&data)->~unique_ptr();
     }
 
     template<typename T0, typename T1, typename ... Args>
@@ -148,7 +148,11 @@ private:
             which = t2;
         } catch (...)
         {
-            which *= 2;
+            if (which == 1)
+                which = 3;
+            else
+                which = 4;
+
             new (&data) std::unique_ptr<T1>(tmp.release());
             throw;
         }
@@ -224,8 +228,16 @@ void swap_impl(either<Left, Right>& a, either<Left, Right>& b, std::unique_ptr<L
     }
     catch (...)
     {
-        a.which *= 2;
-        b.which *= 2;
+        if (a.which == 1)
+            a.which = 3;
+        else
+            a.which = 4;
+
+        if (b.which == 1)
+            b.which = 3;
+        else
+            b.which = 4;
+
         new (&a.data) std::unique_ptr<L>(l.release());
         new (&b.data) std::unique_ptr<R>(r.release());
         throw;
