@@ -184,7 +184,7 @@ private:
     }
 
     template<typename L, typename R, typename LL, typename RR>
-    friend void swap_impl(either<L, R>& left, either<L, R>& right, LL l, RR r, int lt, int rt);
+    friend void swap_impl(either<L, R>& a, either<L, R>& b, std::unique_ptr<LL> l, std::unique_ptr<RR> r, int lt, int rt);
 
 private:
     int which; //1 - Left, 2 - Right, 3 - Left*, 4 - Right*
@@ -211,23 +211,23 @@ auto apply(F const& func, either<Left, Right>& e)
 }
 
 template<typename Left, typename Right, typename L, typename R>
-void swap_impl(either<Left, Right>& a, either<Left, Right>& b, L const l, R const r, int lt, int rt)
+void swap_impl(either<Left, Right>& a, either<Left, Right>& b, std::unique_ptr<L> l, std::unique_ptr<R> r, int lt, int rt)
 {
     try
     {
         a.clear();
         a.which = rt;
-        new (&a.data) R(r);
+        new (&a.data) R(*r);
         b.clear();
         b.which = lt;
-        new (&b.data) L(l);
+        new (&b.data) L(*l);
     }
     catch (...)
     {
         a.which *= 2;
         b.which *= 2;
-        new (&a.data) std::unique_ptr<L>(std::make_unique<L>(l));
-        new (&b.data) std::unique_ptr<R>(std::make_unique<R>(r));
+        new (&a.data) std::unique_ptr<L>(l.release());
+        new (&b.data) std::unique_ptr<R>(r.release());
         throw;
     }
 }
@@ -236,13 +236,13 @@ template<typename Left, typename Right>
 void swap(either<Left, Right>& a, either<Left, Right>& b)
 {
     if (a.is_left() && b.is_left())
-        swap_impl(a, b, a.left(), b.left(), 1, 1);
+        swap_impl(a, b, std::make_unique<Left>(a.left()), std::make_unique<Left>(b.left()), 1, 1);
     else if (a.is_left() && b.is_right())
-        swap_impl(a, b, a.left(), b.right(), 1, 2);
+        swap_impl(a, b, std::make_unique<Left>(a.left()), std::make_unique<Right>(b.right()), 1, 2);
     else if (a.is_right() && b.is_left())
-        swap_impl(a, b, a.right(), b.left(), 2, 1);
+        swap_impl(a, b, std::make_unique<Right>(a.right()), std::make_unique<Left>(b.left()), 2, 1);
     else
-        swap_impl(a, b, a.right(), b.right(), 2, 2);
+        swap_impl(a, b, std::make_unique<Right>(a.right()), std::make_unique<Right>(b.right()), 2, 2);
 }
 
 #endif //EITER_H
