@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <type_traits>
+#include <algorithm>
 
 struct emplace_left_t
 {};
@@ -30,7 +31,7 @@ struct either
     either(either const& that)
         : which(that.which)
     {
-        if (which == 1 || which == 3)
+        if (is_left())
             new (&data) Left(*that.left_data_ptr());
         else
             new (&data) Right(*that.right_data_ptr());
@@ -192,8 +193,8 @@ private:
 
 private:
     int which; //1 - Left, 2 - Right, 3 - Left*, 4 - Right*
-    typename std::aligned_storage<std::max(std::max(sizeof(Left), sizeof(Right)), std::max(sizeof(std::unique_ptr<Left>), sizeof(std::unique_ptr<Right>)))
-    , std::max(std::max(alignof(Left), alignof(Right)), std::max(sizeof(std::unique_ptr<Left>), sizeof(std::unique_ptr<Right>)))>::type data;
+    typename std::aligned_storage<std::max({sizeof(Left), sizeof(Right), sizeof(std::unique_ptr<Left>)})
+    , std::max({alignof(Left), alignof(Right), alignof(std::unique_ptr<Left>)})>::type data;
 };
 
 template<typename F, typename Left, typename Right>
