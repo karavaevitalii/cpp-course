@@ -8,4 +8,7 @@
 ###Fall 2016
 * [Copy-on-write and small-object optimizations for big_integer class](https://github.com/karavaevitalii/university-cpp-course/tree/master/fall-2016/big-integer) 
 * [std::bind implementation](https://github.com/karavaevitalii/university-cpp-course/tree/master/fall-2016/bind-impl)
+
+###Exams
 * [Persistent set](https://github.com/karavaevitalii/cpp-course/tree/master/fall-2016/exam/persistent-set)
+* [Either](https://github.com/karavaevitalii/cpp-course/tree/master/fall-2016/exam/either)
